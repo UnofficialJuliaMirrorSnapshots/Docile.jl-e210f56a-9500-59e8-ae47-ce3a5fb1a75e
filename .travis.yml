@@ -1,0 +1,16 @@
+language: julia
+os:
+    - linux
+    - osx
+julia:
+    - 0.3
+    - 0.4
+    - nightly
+sudo: false
+notifications:
+    email: false
+script:
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("Docile"); Pkg.test("Docile"; coverage=true)'
+after_success:
+    - julia -e 'if VERSION >= v"0.4-" && OS_NAME == :Linux; cd(Pkg.dir("Docile")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder()); end'
